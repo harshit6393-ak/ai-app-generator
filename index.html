@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI App Generator Pro</title>
+    <style>
+        :root { --primary: #2563eb; --bg: #f8fafc; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        .header { background: white; padding: 20px; border-bottom: 1px solid #e2e8f0; }
+        .container { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 350px; padding: 20px; border-right: 1px solid #e2e8f0; background: white; display: flex; flex-direction: column; }
+        .main-view { flex: 1; padding: 20px; background: #334155; display: flex; flex-direction: column; }
+        textarea { width: 100%; height: 150px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 15px; box-sizing: border-box; resize: vertical; }
+        
+        button { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; transition: background 0.2s; }
+        button:hover { background: #1d4ed8; }
+        button:disabled { background: #94a3b8; cursor: not-allowed; }
+        
+        iframe { flex: 1; width: 100%; height: 100%; border: none; border-radius: 12px; background: white; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .error-box { background: #fee2e2; color: #991b1b; padding: 15px; border-radius: 8px; border: 1px solid #f87171; margin-top: 20px; font-size: 14px; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>🚀 AI App Generator</h1>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <h3>Describe your App</h3>
+            <form method="POST" id="appForm">
+                <textarea name="user_input" placeholder="e.g., A calculator app with a dark mode toggle..." required>{{ user_input }}</textarea>
+                <button type="submit" id="buildBtn">Build Real App</button>
+            </form>
+            
+            <div id="loadingText" style="display: none; margin-top: 15px; color: #2563eb; font-weight: bold; text-align: center;">
+                ⏳ AI is writing code...<br><small>(This usually takes 10-15 seconds)</small>
+            </div>
+
+            {% if generated_app and "<h1>Error</h1>" not in generated_app %}
+            <div style="margin-top: 20px; color: #16a34a; font-weight: bold; text-align: center;">
+                <p>✅ App Generated Successfully!</p>
+            </div>
+            {% endif %}
+            
+            {% if generated_app and "<h1>Error</h1>" in generated_app %}
+            <div class="error-box">
+                <strong>⚠️ Generation Failed:</strong><br><br>
+                {{ generated_app | safe }}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="main-view">
+            {% if generated_app and "<h1>Error</h1>" not in generated_app %}
+                <iframe id="preview"></iframe>
+                <script>
+                    // We use backticks and safe rendering to inject the code properly
+                    const code = `{{ generated_app | safe }}`;
+                    const iframe = document.getElementById('preview');
+                    iframe.srcdoc = code;
+                </script>
+            {% else %}
+                <div style="color: #94a3b8; text-align: center; margin-top: 200px; font-family: monospace; font-size: 18px;">
+                    <p>&lt; Your App Preview will appear here /&gt;</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('appForm').addEventListener('submit', function() {
+            const btn = document.getElementById('buildBtn');
+            const loadingText = document.getElementById('loadingText');
+            btn.disabled = true;
+            btn.innerHTML = 'Building... ⏳';
+            loadingText.style.display = 'block';
+        });
+    </script>
+
+</body>
+</html>
